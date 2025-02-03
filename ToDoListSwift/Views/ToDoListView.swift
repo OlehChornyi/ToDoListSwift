@@ -16,20 +16,32 @@ struct ToDoListView: View {
         NavigationStack {
             List {
                 ForEach(toDos) { toDo in
-                    HStack {
-                        Image(systemName: toDo.isCompleted ? "checkmark.rectangle" : "rectangle")
-                            .onTapGesture {
-                                toDo.isCompleted.toggle()
-                                guard let _ = try? modelContext.save() else {return}
+                    VStack (alignment: .leading){
+                        HStack {
+                            Image(systemName: toDo.isCompleted ? "checkmark.rectangle" : "rectangle")
+                                .onTapGesture {
+                                    toDo.isCompleted.toggle()
+                                    guard let _ = try? modelContext.save() else {return}
+                                }
+                            
+                            NavigationLink {
+                                DetailView(toDo: toDo)
+                            } label: {
+                                Text(toDo.item)
                             }
+                        }
+                        .font(.title2)
                         
-                        NavigationLink {
-                            DetailView(toDo: toDo)
-                        } label: {
-                            Text(toDo.item)
+                        HStack {
+                            Text(toDo.dueDate.formatted(date: .abbreviated, time: .shortened))
+                                .foregroundStyle(.secondary)
+                            
+                            if toDo.reminderIsOn {
+                                Image(systemName: "calendar.badge.clock")
+                                    .symbolRenderingMode(.multicolor)
+                            }
                         }
                     }
-                    .font(.title2)
                     //                    .swipeActions {
                     //                        Button("Delete", role: .destructive) {
                     //                            modelContext.delete(toDo)
@@ -70,5 +82,5 @@ struct ToDoListView: View {
 
 #Preview {
     ToDoListView()
-        .modelContainer(for: ToDo.self, inMemory: true)
+        .modelContainer(ToDo.preview)
 }
